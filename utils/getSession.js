@@ -6,29 +6,36 @@
 const axios = require('axios');
 const { getQueryKey } = require('./getQueryKey');
 
-async function getSession(space='quoraspacesupdates') {
-  const session = await axios
-    .get(`https://www.quora.com/q/${space}?sort=recent`)
-    .then(async (res) => {
-      // Extracts the tribeHash(space-ID) from a webpack file name.
-      const tribeHash = res.data.match(/Multifeed-\d\d-(.*?).webpack/)[1]
-      // Finds file containing a key to validate query
-      var webpackURL = `https://qsbr.fs.quoracdn.net/-4-ans_frontend-relay-component-Multifeed-27-${tribeHash}.webpack`
-      // Extracts key
-      const QueryKey = await getQueryKey(webpackURL)
-      // Minimal api header to get post response. (update every ~12hr)
+async function getHeader(tribe) {
+  const header = await axios
+    .get(`https://www.quora.com/q/${tribe}?sort=recent`)
+    .then(res => {
       return {
         cookie: 'm-b='+res.data.match(/\\"browserId\\":\\"(.*?)\\",/)[1]+";",
         formKey: res.data.match(/"formkey":"(.*?)",/)[1],
         windowId: res.data.match(/"windowId": "(.*?)",/)[1],
-        revision: res.data.match(/"revision": "(.*?)",/)[1],
-        queryKey: QueryKey,
-        unix: new Date()
+        revision: res.data.match(/"revision": "(.*?)",/)[1]
       }
     })
     .catch((error) => {
-      console.error(error)
+      console.error('getQueryKey Error: ', error.message)
     })
+  return header
+}
+
+async function getSession(tribe='quoraspacesupdates', user='Adam-DAngelo') {
+  const tribeQueryKey = await getQueryKey('tribe', tribe)
+  const userQueryKey = await getQueryKey('user', user)
+  const header = await getHeader(tribe)
+
+  // Minimal api header to get post response. (update every ~12hr)
+  const session = {
+    ...header,
+    tribeQueryKey,
+    userQueryKey,
+    unix: new Date()
+  }
+
   console.log('Session:', session)
   return session
 }
