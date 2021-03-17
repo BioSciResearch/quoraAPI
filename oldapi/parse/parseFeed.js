@@ -1,5 +1,5 @@
 const {parseMatchObj} = require('./utils/parseMatchObj')
-const {parseQContentObj, qContentText, qContentImg, getName, parseTime, sanitizeLink} = require('./utils/parseQContent')
+const {parseQContentObj, qContentText, qContentImg, getName, parseTime, sanitizeLink} = require('../../utils/parseQContent')
 
 /***   Helpers   ***/
 const user = {

@@ -9,7 +9,7 @@ You can read more about how this works in the README,
 under my choice to use an anti-pattern that benefits this method.
 */
 const axios = require('axios')
-const { unescapeJSON } = require('./unescapeJson')
+const { unescapeJSON } = require('../../../utils/unescapeJson')
 
 function arrToObj(obj, arr, value={}, i=0) {
   // key array convered to object depth:
