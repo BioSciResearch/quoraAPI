@@ -14,28 +14,23 @@ const user = obj => {
 }
 
 const feedReason = obj => {
-  return {
-    //question:{
-      user: {
-        name: getName(obj.userNames[0].names),
-        pic: obj.userPhotos[0].profileImageUrl
-      }
-    //}
+  var fr = obj.feedReason
+  return fr.userNames && {
+    name: getName(fr.userNames[0].names),
+    pic: fr.userPhotos[0].profileImageUrl
   }
 }
 
 const conserved = obj => {
-  const tribe = obj.tribeItem.tribe
   return {
     type: obj.__typename,
     url: sanitizeLink(obj.url),
     unix: parseTime(obj.creationTime),
-    ...user(obj),
-    space: {
-      name: qContentText(parseQContentObj(tribe.name)),
-      url: sanitizeLink(tribe.url),
-      image: tribe.image
-    }
+    space: (obj.tribeItem && {
+      name: qContentText(parseQContentObj(obj.tribeItem.tribe.name)),
+      url: sanitizeLink(obj.tribeItem.tribe.url),
+      image: obj.tribeItem.tribe.iconUrl
+    })
   }
 }
 
@@ -52,8 +47,8 @@ const content = obj => {
 const question = obj => { 
   return {
     ...conserved(obj),
-    //...user(obj),
-    ...feedReason(obj),
+    // ...user(obj),
+    // ...feedReason(obj),
     title: qContentText(parseQContentObj(obj.title)),
     refLink: obj.sourceUrl
   }
@@ -62,8 +57,9 @@ const question = obj => {
 const answer = obj => { 
   return {
     ...conserved(obj),
-    question: question(obj),
-    content: content(obj.content)
+    ...user(obj),
+    question: question(obj.question),
+    ...content(obj.content)
   }
 }
 
@@ -71,7 +67,8 @@ const post = obj => {
   return {
     title: qContentText(parseQContentObj(obj.title)),
     ...conserved(obj),
-    content: content(obj.content)
+    ...user(obj),
+    ...content(obj.content)
   }
 }
 
@@ -80,16 +77,14 @@ const post = obj => {
 /***   Share Types   ***/
 const hyperlink = obj => { 
   return {
-    hyper: {
-      type: obj.__typename,
-      image: obj.imageUrls[0],
-      unix: obj.publishTime,
-      site: obj.publisherSitename,
-      favicon: obj.publisherIconUrl,
-      url: obj.originalUrl,
-      title: obj.title,
-      text: obj.description
-    }
+    type: obj.__typename,
+    image: obj.imageUrls[0],
+    unix: obj.publishTime,
+    site: obj.publisherSitename,
+    favicon: obj.publisherIconUrl,
+    url: obj.originalUrl,
+    title: obj.title,
+    text: obj.description
   }
 }
 
@@ -103,11 +98,14 @@ function getType(obj) {
 function getShare(obj) {
   const subtype = getType(obj.share)
   var shareOG  = obj.share
+
   const share = {
     ...conserved,
-    source: sanitizeLink(shareOG.permaUrl),
+    type: 'share',
+    ...user(obj.share),
+    source: sanitizeLink(shareOG.url),
     comment: qContentText(parseQContentObj(shareOG.comment)),
-    refLink: shareOG.embeddedContentUrl,
+    refLink: shareOG.embeddedContentUrl, // only if user provided reference for question
     title: shareOG.title,
 
     shared: (subtype ==='share' ? getShare(shareOG.share) : { hyperlink, question, answer, post }[subtype](shareOG[subtype]))
@@ -124,15 +122,10 @@ function parseFeed(feed) {
   var content = []
   for(var obj of flatFeed) {
     const type = getType(obj)
-
     // Get share type, else get post type
-    const parseObjKey = type==='share' ? getShare(obj[type]) : { post, question, answer }[type](obj[type])
+    const parsedObj = type==='share' ? getShare(obj) : { post, question, answer }[type](obj[type])
+    if ('question'===type) { parsedObj['user'] = feedReason(obj) }
     // if(type==='share'){console.log(JSON.stringify(obj, null, 4))}
-    //parseObjKey.unix = parseTime(obj[type])
-
-    var parsedObj = {type, content: parseObjKey}
-    parsedObj.user = parsedObj.content.user //expose top content user
-    parsedObj.unix = parsedObj.content.unix //expose top content user
 
     content.push(parsedObj); //console.log(parsedObj) //JSON.stringify(parseObjKey, null, 4) )
   }

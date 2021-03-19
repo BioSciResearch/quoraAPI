@@ -3,12 +3,21 @@ const { tribeQuery } = require('./api/tribeQuery');
 const { parseFeed } = require('./api/parseFeed');
 
 
-const content = {
+/* const content = {
   tribeID: 1584598,
   name: 'quoraspacesupdates',
   url: 'https://www.quora.com/q/quoraspacesupdates',
   images: {
     icon:'https://qph.fs.quoracdn.net/main-thumb-ti-1584598-100-rzmcwzxgcmfioltgwwmgiyidoeouowds.jpeg'
+  }
+}; */
+
+const content = {
+  tribeID: 317,
+  name: 'biosciclub',
+  url: 'https://www.quora.com/q/biosciclub',
+  images: {
+    icon:'ttps://qph.fs.quoracdn.net/main-thumb-ti-317-100-avfloxciwracrizwjbgysznasrvdntpi.jpeg'
   }
 };
 
@@ -29,6 +38,7 @@ const test = async (session, content) => {
     var parsed = parseFeed(feed, content) //question ?'question' : false
     //parsed = question ? parsed: parsed.filter(x => !(x.type==='question'))
     console.log(parsed)
+    //console.log(JSON.stringify(parsed, null, 4))
   }
 }
 initSession(test, [content])
@@ -44,7 +54,7 @@ const seekNew = async (session, content, lastQuery, options={depth:0}) => {
     })
 
   var filterNew = parsed.filter(obj => {
-    const isNew = obj.unix > lastQuery  // .getTime()
+    const isNew = obj.unix > lastQuery //.getTime()
     return isNew
   })
 
@@ -59,7 +69,7 @@ const seekNew = async (session, content, lastQuery, options={depth:0}) => {
   console.log(filterNew)
   return filterNew
 }
-//initSession(seekNew, [content, 1610000000000])
+//initSession(seekNew, [content, 1510000000000])
 
 
 /* 
