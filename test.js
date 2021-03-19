@@ -1,6 +1,6 @@
 const { getSession } = require('./session/getSession');
 const { tribeQuery } = require('./api/tribeQuery');
-const { parseFeed } = require('./oldapi/parse/parseFeed');
+const { parseFeed } = require('./api/parseFeed');
 
 
 const content = {
@@ -23,7 +23,7 @@ const initSession = async (callback, args=[]) => {
 
 const test = async (session, content) => {
   var [feed, endCursor] = await tribeQuery(session, content.tribeID)
-  console.log(feed)
+  //console.log(feed)
 
   if (feed) {
     var parsed = parseFeed(feed, content) //question ?'question' : false
@@ -31,7 +31,7 @@ const test = async (session, content) => {
     console.log(parsed)
   }
 }
-//initSession(test, [content])
+initSession(test, [content])
 
 
 
