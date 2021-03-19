@@ -1,56 +1,27 @@
 const axios = require('axios')
+const { query } = require('../utils/queryHelper')
 
-
-// –> source <link as='script' rel='preload' href='https://qsbr.fs.quoracdn.net/-4-ans_frontend-relay-component-UserProfileTab-combined-27-0c328974018015f6.webpack' />
-// –> https://qsbr.fs.quoracdn.net/-4-ans_frontend-relay-component-UserProfileTab-combined-27-0c328974018015f6.webpack
-// –> params:{operationKind:"query",name:"UserProfileCombinedListQuery",id:"36c9966ed8929a13a7f204b3f19dc8006a4409588ced950dfb69bda81fb7766e"
-
-async function userFeedQuery(content, session, feedAfter=false, question=false, depth=0) {
-  const headers = {
-    "quora-window-id": session.windowId,
-    "quora-formkey": session.formKey,
-    "cookie": session.cookie,
-    "quora-revision": session.revision,
-  }
-
+async function userQuery(session, userID, options = {}) {
   const data = {
     queryName:"UserProfileCombinedListQuery",
     extensions: {
       hash: session.userQueryKey,
     },
     variables: {
-      uid: content.userID,
+      uid: userID,
       order: 1,
       first: 8
     }
   }
 
-  if (feedAfter) {
-    data["variables"]["after"] = feedAfter
+  if (options.feedAfter) {
+    data["variables"]["after"] = options.feedAfter // + 1 ? idk...
   }
 
-  var [feed, endCursor] = await axios.post(
-    "https://www.quora.com/graphql/gql_para_POST?q=UserProfileCombinedListQuery", 
-    data, { headers: headers }
-  )
-  .then(res => {
-    return res.data.data.user.combinedProfileFeedConnection
-  })
-  .then(res => {
-    console.log(res)
-    const queryInfo = res.pageInfo // pageInfo: { hasNextPage: true, endCursor: '8583263101309667894' }
-    const resFeed = res // Parse edges next (.edges.map(edge => edge.node))
-    return [resFeed, queryInfo.hasNextPage?queryInfo.endCursor:'']
-  })
-  .catch(err => {
-    console.log('Qfeed-user GET Failed:', `${err.message}\n${new Date().getTime()}`)
-  })
-
-  return [feed, endCursor]
+  return query(session, data)  // [feed, endCursor]
 }
 
-exports.userFeedQuery = userFeedQuery
-
+exports.userQuery = userQuery
 
 
 const session = {
@@ -65,6 +36,8 @@ const session = {
 const content = {userID: 21508824}
 
 const test = async () => {
-  console.log(await userFeedQuery(content, session))
+  var feed = await userQuery(session, content.userID, {feedAfter: 2})
+
+  console.log(feed[0].edges.map(edge=>edge.node))
 }
 test()

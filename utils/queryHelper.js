@@ -10,10 +10,19 @@ const paths = {
   MultifeedQuery: res => res.data.data.multifeedObject.multifeedConnection
 }
 
-async function query(data, headers) {
+const headers = (session) => {
+  return {
+    "quora-window-id": session.windowId,
+    "quora-formkey": session.formKey,
+    "cookie": session.cookie,
+    "quora-revision": session.revision,
+  }
+}
+
+async function query(session, data) {
   var type = data.queryName
-  var [feed, endCursor]  = await axios.post(
-    queryUrl+type, data, { headers }
+  var [feed, endCursor] = await axios.post(
+    queryUrl+type, data, { headers: headers(session) }
   )
     .then(paths[type])
     .then(res => {

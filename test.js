@@ -12,15 +12,17 @@ const content = {
   }
 };
 
-
-const test = async () => {
-  // Loop with call back to get every 12 hours after start-up
+// Loop with call back to get every 12 hours after start-up
+const initSession = async (callback, args=[]) => {
   var session = await getSession()
   setInterval(async () => {
     session = await getSession()
   }, 12*60*60*1000)
+  await callback(session, ...args)
+}
 
-  var [feed, endCursor] = await tribeQuery(content, session)
+const test = async (session, content) => {
+  var [feed, endCursor] = await tribeQuery(session, content.tribeID)
   console.log(feed)
 
   if (feed) {
@@ -28,8 +30,33 @@ const test = async () => {
     //parsed = question ? parsed: parsed.filter(x => !(x.type==='question'))
     console.log(parsed)
   }
-
 }
+//initSession(test, [content])
 
-test()
 
+
+const seekNew = async (session, content, lastQuery, options={depth:0}) => {
+  console.log('enter')
+  var [parsed, endCursor] = await tribeQuery(session, content.tribeID)
+    .then(([feed, endCursor]) => {
+      var parsed = parseFeed(feed, content)
+      return [parsed, endCursor]
+    })
+
+  var filterNew = parsed.filter(obj => {
+    const isNew = obj.unix > lastQuery  // .getTime()
+    return isNew
+  })
+
+  if (!(filterNew.length < parsed.length)) {  // if none get filtered for being old
+    console.log('next get:', options.depth+1 )
+    options = {...options, feedAfter: endCursor, depth: options.depth+1}
+    filterNew = await seekNew(session, content, lastQuery, options).then(
+      res => [...filterNew, ...res]
+    )
+  }
+
+  console.log(filterNew)
+  return filterNew
+}
+//initSession(seekNew, [content, 1610000000000])
