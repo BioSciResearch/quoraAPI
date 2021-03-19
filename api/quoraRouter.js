@@ -1,3 +1,5 @@
+const { routeParser } = require('./parse.js');
+
 function routeMatch(url, pattern){
   return Boolean(url.match(pattern))
 }
@@ -11,24 +13,12 @@ const routes = Object.entries({
   tribeItem: /\/q\/(.*?)\/(.*?)[/]?$/ //tribeItem // answer, post, question, share[share, hyperlink, answer, post, question]
 })
 
-/* this can be removed with a better parser import/export */
-const { getAnswer } = require('./parse/getAnswer.js');
-const { getTribe } = require('./parse/getTribe.js');
-const { getUser } = require('./parse/getUser.js');
-const parser = Object.entries({
-  answer: getAnswer,
-  tribe: getTribe,
-  user: getUser,
-  unanswered: ()=>{},
-  question: ()=>{},
-  tribeItem: ()=>{},
-})
 
 exports.quoraRouter = async (fullURL, feedItem) => {
   for ( let [type, pattern] of routes ) {
     if ( routeMatch(fullURL, pattern) ) {
       console.log(`${type}: ${pattern}`)
-      return parser[type](fullURL, feedItem)
+      return routeParser[type](fullURL, feedItem)
     }
   }
   console.log('failure route:', fullURL)
@@ -41,4 +31,4 @@ exports.quoraRouter = async (fullURL, feedItem) => {
 //url = 'https://www.quora.com/profile/Jeffrey-Brender' // user
 //url = 'https://www.quora.com/unanswered/What-did-the-structure-of-DNA-s-double-helix-suggest-about-DNA-s-properties' // unanswered
 //url = 'https://www.quora.com/Where-can-I-find-good-developers/' //question
-//url = 'https://www.quora.com/q/coronaviruswatch/SARS-CoV-2-reactive-T-cells-in-healthy-donors-and-patients-with-COVID-19'
+//url = 'https://www.quora.com/q/coronaviruswatch/SARS-CoV-2-reactive-T-cells-in-healthy-donors-and-patients-with-COVID-19' // tribeItem

@@ -60,3 +60,13 @@ const seekNew = async (session, content, lastQuery, options={depth:0}) => {
   return filterNew
 }
 //initSession(seekNew, [content, 1610000000000])
+
+
+/* 
+const {getQuora} = require('./api/getQuora')
+const {quoraRouter} = require('./api/quoraRouter')
+var url = "https://www.quora.com/q/quoraspacesupdates"
+getQuora(url, quoraRouter).then(res => {
+  console.log(res)
+})
+*/

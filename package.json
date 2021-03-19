@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "get-value": "^3.0.1",
+    "set-value": "^3.0.2"
   }
 }
