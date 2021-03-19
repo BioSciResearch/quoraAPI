@@ -16,7 +16,7 @@ async function userFeedQuery(content, session, feedAfter=false, question=false, 
   const data = {
     queryName:"UserProfileCombinedListQuery",
     extensions: {
-      hash: session.tribeQueryKey,
+      hash: session.userQueryKey,
     },
     variables: {
       uid: content.userID,
@@ -34,12 +34,12 @@ async function userFeedQuery(content, session, feedAfter=false, question=false, 
     data, { headers: headers }
   )
   .then(res => {
-    const queryInfo = res.data.data
-    return queryInfo
+    return res.data.data.user.combinedProfileFeedConnection
   })
   .then(res => {
-    const queryInfo = res.data.data.user.pageInfo // pageInfo: { hasNextPage: true, endCursor: '8583263101309667894' }
-    const resFeed = res.data.data.user.combinedProfileFeedConnection // Parse edges next (.edges.map(edge => edge.node))
+    console.log(res)
+    const queryInfo = res.pageInfo // pageInfo: { hasNextPage: true, endCursor: '8583263101309667894' }
+    const resFeed = res // Parse edges next (.edges.map(edge => edge.node))
     return [resFeed, queryInfo.hasNextPage?queryInfo.endCursor:'']
   })
   .catch(err => {
@@ -54,12 +54,12 @@ exports.userFeedQuery = userFeedQuery
 
 
 const session = {
-  windowId: 'react_fxzcmzpriavrrdpd',
-  formKey: 'e59ae13fc2fe1167230a89c7b053822c',
-  cookie: 'm-b=em-iLZNPxUBYBPWMaTaIZg==',
-  revision: '37a9ef60d42f01f8fb4c40b7edd259e589c96ab7',
-  tribeQueryKey: ,
-  tribeQueryKey: '36c9966ed8929a13a7f204b3f19dc8006a4409588ced950dfb69bda81fb7766e'
+  cookie: 'm-b=BXiQlmu70a4S9VxwK742Mg==;',
+  formKey: 'f5f6bd7980e0991ab650a86181db0bce',
+  windowId: 'react_mdcldjbripgfetwb',
+  revision: '669b86c9d74b0b7511008816f077e86c41232585',
+  tribeQueryKey: 'e22046587ff2a4a13b9819f049c86f091772c336df24138553feff916ba6f3f5',
+  userQueryKey: '36c9966ed8929a13a7f204b3f19dc8006a4409588ced950dfb69bda81fb7766e',
 }
 
 const content = {userID: 21508824}
