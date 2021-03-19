@@ -47,8 +47,6 @@ const content = obj => {
 const question = obj => { 
   return {
     ...conserved(obj),
-    // ...user(obj),
-    // ...feedReason(obj),
     title: qContentText(parseQContentObj(obj.title)),
     refLink: obj.sourceUrl
   }
