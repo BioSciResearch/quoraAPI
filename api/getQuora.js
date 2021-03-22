@@ -5,7 +5,7 @@ function defaultReturn(fullURL, res) {
 }
 
 // Takes callback, but defaults to await/then use
-module.exports.getQuora = async (url, callback=defaultReturn) => {
+exports.getQuora = async (url, callback=defaultReturn) => {
   return await axios.get(encodeURI(url))
     .then(res => {
       const fullURL = res.request.connection._httpMessage.res.responseUrl
@@ -13,14 +13,25 @@ module.exports.getQuora = async (url, callback=defaultReturn) => {
     })
     .catch(err =>{
       console.log('Quora GET Failed:', `${err.message}\n${url}\n${Date.now()}`)
+      console.log(err)
       return err
     })
 }
 
-/* 
-const {quoraRouter} = require('./quoraRouter')
+
+/*** TESTS ***/
+const tests = {}
 var url = "https://www.quora.com/q/quoraspacesupdates"
-module.exports.getQuora(url, quoraRouter).then(res => {
-  console.log(res)
-})
- */
+tests.default = function () {
+  return module.exports.getQuora(url).then(res => {
+    console.log('done');  // console.log(res)
+  })
+}
+tests.router = function () { 
+  const {quoraRouter} = require('./quoraRouter')
+  return module.exports.getQuora(url, quoraRouter).then(res => {
+    console.log('done');  // console.log(res)
+  })
+}
+const { test } = require('../utils/test')
+test(module)(tests)

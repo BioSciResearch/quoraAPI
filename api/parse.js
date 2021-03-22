@@ -55,7 +55,7 @@ async function answer(v) {
   if(typeof v === 'object') { //Object.keys(v).length > 0
     var url=v.permaUrl
     url = url[0] === '/'?'https://www.quora.com'+url:url
-    return await getQuora(url, module.exports.getAnswer)//(url)
+    return await getQuora(url, getAnswer)//(url)
   } else { 
     return false 
   }
@@ -126,19 +126,19 @@ const getTribe = (fullURL, res) => {
 
 
 /* 
-getQuora('https://www.quora.com/profile/Adam-DAngelo', module.exports.getUser).then(
+getQuora('https://www.quora.com/profile/Adam-DAngelo', getUser).then(
   res => console.log(res)
 )
 
-getQuora('https://www.quora.com/Will-Uber-dominate-the-home-food-delivery-market-—-restaurants-groceries-etc-Is-there-space-left-for-independent-companies-What-is-the-success-rate-of-UberEats/answer/Adam-DAngelo', module.exports.getAnswer).then(
+getQuora('https://www.quora.com/Will-Uber-dominate-the-home-food-delivery-market-—-restaurants-groceries-etc-Is-there-space-left-for-independent-companies-What-is-the-success-rate-of-UberEats/answer/Adam-DAngelo', getAnswer).then(
   res => console.log(res)
 ) 
 
-getQuora('https://qr.ae/pNjM2H', module.exports.getPost).then(
+getQuora('https://qr.ae/pNjM2H', getPost).then(
   res => console.log(res)
 )
 
-getQuora('https://www.quora.com/q/quoraspacesupdates?sort=recent', module.exports.getTribe).then(
+getQuora('https://www.quora.com/q/quoraspacesupdates?sort=recent', getTribe).then(
   res => console.log(res)
 )
 */

@@ -17,7 +17,7 @@ const routes = Object.entries({
 exports.quoraRouter = async (fullURL, feedItem) => {
   for ( let [type, pattern] of routes ) {
     if ( routeMatch(fullURL, pattern) ) {
-      console.log(`${type}: ${pattern}`)
+      console.log(`${type}`)
       return routeParser[type](fullURL, feedItem)
     }
   }
@@ -32,3 +32,12 @@ exports.quoraRouter = async (fullURL, feedItem) => {
 //url = 'https://www.quora.com/unanswered/What-did-the-structure-of-DNA-s-double-helix-suggest-about-DNA-s-properties' // unanswered
 //url = 'https://www.quora.com/Where-can-I-find-good-developers/' //question
 //url = 'https://www.quora.com/q/coronaviruswatch/SARS-CoV-2-reactive-T-cells-in-healthy-donors-and-patients-with-COVID-19' // tribeItem
+
+
+/*** TESTS ***/
+const tests = {}
+tests.default = async function () {
+  return await console.log('hi')
+}
+const { test } = require('../utils/test')
+test(module)(tests)
