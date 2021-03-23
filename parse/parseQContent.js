@@ -1,5 +1,13 @@
 /* Helper functions for parsing scraped Quora content */
-const { unescapeJSON } = require("./unescapeJson")
+const { unescapeJSON } = require("../utils/unescapeJson")
+
+function parseQContentObj(strObj) {
+  if(strObj.constructor === String) {
+    return unescapeJSON(strObj).sections.map(el=>el.spans).flat()
+  } else {
+    return ''
+  }
+}
 
 module.exports = {
   /* Patterns */
@@ -30,28 +38,9 @@ module.exports = {
       return ''
     }
   },
-  /* function getConservedContent(contentObj, type) {
-    const unix = Math.round(contentObj[type]["creationTime"] / 1000)
-    var name, pic;
-    if (['question', 'answer'].includes(type)) {
-      pic = contentObj.feedReason.userPhotos[0].profileImageUrl
-      name = contentObj.feedReason.userNames[0].names.filter(name => name.scriptCode==="LATN")[0]
-    } else {
-      pic = contentObj[type].author.profileImageUrl
-      name = contentObj[type].author.names.filter(name => name.scriptCode==="LATN")[0] //Assumes latin name exists
-    }
-    return {
-      type: [type, contentObj[type]["__typename"]],
-      feedType: contentObj["__typename"],
-      unix: [unix, new Date(unix).toString()],
-      user: {
-        name: name ? `${name.givenName} ${name.familyName}`: 'unverified name',
-        pic: pic  
-      }
-    }
-  } */
 
   qContentImg(arr) {
+    arr = parseQContentObj(arr)
     if(arr) {
       const imgObj = arr.filter(obj=>obj.modifiers.image)[0]
       return imgObj ? imgObj.modifiers.image : false
@@ -61,6 +50,7 @@ module.exports = {
   },
 
   qContentText(arr, trim = false) {
+    arr = trim ? arr : parseQContentObj(arr)
     if(arr) {
       const text = arr.map(obj=>obj.text).flat().join('')
       return trim ? text.substring(0, trim) + '...' : text
@@ -69,11 +59,9 @@ module.exports = {
     }
   },
 
-  parseQContentObj(strObj) {
-    if(strObj.constructor === String) {
-      return unescapeJSON(strObj).sections.map(el=>el.spans).flat()
-    } else {
-      return ''
-    }
-  }
+  getExr(v) {
+    return v.constructor===Object?'':v
+  },
+
+  parseQContentObj
 }

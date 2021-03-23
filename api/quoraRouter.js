@@ -1,31 +1,45 @@
-const { routeParser } = require('./parse.js');
+const { unescapeJSON } = require('../utils/unescapeJson')
+const { parsePage } = require('../parse');
 
 function routeMatch(url, pattern){
+  // Does given url match route pattern?
   return Boolean(url.match(pattern))
 }
 
-const routes = Object.entries({
-  answer: '/answer/',  // getAnswer(fullURL, res)
-  tribe: /\/q\/([^/]*?)[/]?$/, // getTribe(fullURL, res)
-  user: '/profile/',  // getUser(fullURL, res)
-  unanswered: '/unanswered/', // 'unanswered'
-  question: /https:\/\/www.quora.com\/([^/]*?)[/]?$/,  // 'question'
-  tribeItem: /\/q\/(.*?)\/(.*?)[/]?$/ //tribeItem // answer, post, question, share[share, hyperlink, answer, post, question]
+const routePatterns = Object.entries({
+  answer: '/answer/',
+  tribe: /\/q\/([^/]*?)[/]?$/,
+  user: '/profile/',
+  unanswered: '/unanswered/',
+  question: /https:\/\/www.quora.com\/([^/]*?)[/]?$/,
+  tribeItem: /\/q\/(.*?)\/(.*?)[/]?$/
+  // tribeItem: { answer, post, question, share[share[...], hyperlink, answer, post, question] }
 })
 
 
-exports.quoraRouter = async (fullURL, feedItem, test=false) => {
-  for ( let [type, pattern] of routes ) {
+function getContent(html, type) {
+  // Parse HTML string to get Content Object
+  const pattern = RegExp(String.raw`(\"{\\"data\\":{\\"${type}\\":(.*?)}\");`) // RegExp(`(\\"{\\\\"data\\\\":{\\\\"${type}\\\\":(.*?)}\\");`)
+  const dataObj = html.data.match(pattern)[1]
+  const contentObj = unescapeJSON(dataObj).data[type]
+  return contentObj
+}
+
+
+exports.quoraRouter = async (fullURL, html, test=false) => {
+  for ( let [type, pattern] of routePatterns ) {
     if ( routeMatch(fullURL, pattern) ) {
-      //console.log(`${type}`)
-      return test ? type : routeParser[type](fullURL, feedItem) 
+      if (test) {return type} else { console.log(type) }
+      const contentObj = getContent(html, type)
+      return parsePage(fullURL, type, contentObj) 
     }
   }
   console.log('failure route:', fullURL)
   return 'failed route'
 }
 
-/***   Tests   ***/
+
+/*** TESTS ***/
 const urls = Object.entries({
   answer: 'https://www.quora.com/Could-we-ever-create-infectious-vaccines/answer/Jennifer-Hu-1', // answer
   tribe: 'https://www.quora.com/q/bioscience-club', // tribe
@@ -35,7 +49,6 @@ const urls = Object.entries({
   tribeItem: 'https://www.quora.com/q/coronaviruswatch/SARS-CoV-2-reactive-T-cells-in-healthy-donors-and-patients-with-COVID-19' // tribeItem
 })
 
-/*** TESTS ***/
 const tests = {}
 tests.default = async function () {
   return await console.log('run')
