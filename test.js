@@ -1,6 +1,6 @@
 const { getSession } = require('./session/getSession');
 const { tribeQuery } = require('./api/tribeQuery');
-const { parseFeed } = require('./api/parseFeed');
+const { parseFeed } = require('./parse');
 
 
 /* const content = {
