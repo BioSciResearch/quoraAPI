@@ -1,3 +1,8 @@
+/*
+  This file contains the primary content types (questions, answers, posts, shares, etc.)
+  it heavily utilizes parseQContent to reformat api data appropriately and parseHelpers 
+  for redundant remapping patterns.
+*/
 const {conserved, user, content, getType} = require('./parseHelpers')
 const {parseQContentObj, qContentText, sanitizeLink} = require('./parseQContent')
 

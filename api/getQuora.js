@@ -6,6 +6,7 @@ function defaultReturn(fullURL, res) {
 
 // Takes callback, but defaults to await/then use
 exports.getQuora = async (url, callback=defaultReturn) => {
+  // Gets html via Quora url, designed to take quoraRouter as callback or future html parser
   return await axios.get(encodeURI(url))
     .then(res => {
       const fullURL = res.request.connection._httpMessage.res.responseUrl

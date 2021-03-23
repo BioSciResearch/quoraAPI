@@ -27,6 +27,8 @@ function getContent(html, type) {
 
 
 exports.quoraRouter = async (fullURL, html, test=false) => {
+  // Given inputs from getQuora, determine page type by pattern matching the url
+  // then, send html to appropriate page based parser.
   for ( let [type, pattern] of routePatterns ) {
     if ( routeMatch(fullURL, pattern) ) {
       if (test) {return type} else { console.log(type) }

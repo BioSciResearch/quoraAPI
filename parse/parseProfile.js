@@ -1,3 +1,8 @@
+/*
+  This file exists for tribe and user pages, as their content object differs significantly from the rest.
+  Additionally, these content types are only used for getQuora/parsePage.
+*/
+
 const {parseQContentObj, qContentText, qContentImg, getName, parseTime, getExr} = require('./parseQContent')
 var quoraRouter, getQuora;
 
@@ -21,6 +26,7 @@ async function getAnswer(v) {
 }
 
 const getUser = async (contentObj) => {
+  // Remaps user content object from a users profile-page
   var parsedObj = {
     type: 'user',
     content: {
@@ -44,6 +50,7 @@ const getUser = async (contentObj) => {
 
 
 const getTribe = (contentObj) => {
+  // Remaps user content object from a tribes profile-page
   var parsedObj = {
     type: 'tribe',
     content: {

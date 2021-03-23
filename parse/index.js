@@ -1,8 +1,14 @@
+/*
+  Exports the two primary parsers of this library – a content feed parser and a single page parser.
+  These call the same set of content parser functions to deconstructs and reformat the api response data.
+*/
+
 const { getShare, post, question, unanswered, answer } = require('./parseContent')
 const { getType, feedReason } = require('./parseHelpers')
 const { tribe, user } = require('./parseProfile')
 
 exports.parseFeed = (feed) => {
+  // receives feed object from userQuery or tribeQuery (their output is mostly the same)
   const flatFeed = feed.edges.map(obj => obj.node.stories).flat()
 
   var content = []
@@ -18,7 +24,8 @@ exports.parseFeed = (feed) => {
 }
 
 
-exports.parsePage = async (fullURL, type, contentObj) => {
+exports.parsePage = async (type, contentObj) => {
+  // receives type and content object from quoraRouter, it is then sent to the necessary parser functions
   var parsedObj
   if (type === "tribeItem") {
     const type = getType(contentObj)

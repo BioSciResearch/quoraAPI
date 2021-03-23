@@ -2,6 +2,7 @@ const axios = require('axios')
 const { query } = require('../utils/queryHelper')
 
 async function userQuery(session, userID, options = {}) {
+  // Given query token via session, get user content(Q&A etc.) by api
   const data = {
     queryName:"UserProfileCombinedListQuery",
     extensions: {

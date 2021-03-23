@@ -2,6 +2,7 @@ const axios = require('axios')
 const {query} = require('../utils/queryHelper')
 
 async function tribeQuery(session, tribeID, options = {feedAfter: false, question: false, depth: 0} ) {
+  // Given query token via session, get tribe content(posts etc.) by api
   const data = {
     queryName:"MultifeedQuery",
     extensions: {
